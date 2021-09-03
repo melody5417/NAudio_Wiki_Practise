@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,9 +26,9 @@ namespace NAudio_Wiki_Practise
     /// </summary>
     public partial class MainWindow : Window
     {
-        private IWavePlayer wavePlayer; 
-        private AudioFileReader audioFileReader; 
-        private string fileName;
+        private IAudioPlayer player;
+
+        private IAudioRecorder recorder;
 
         private DispatcherTimer dispatcherTimer;
 
@@ -63,32 +64,29 @@ namespace NAudio_Wiki_Practise
 
         private void btnOpenFileClick(object sender, RoutedEventArgs e)
         {
-            fileName = SelectInputFile();
+            string fileName = SelectInputFile();
+            if (string.IsNullOrWhiteSpace(fileName)) return;
+            player = new WaveOutPlayer();
+            player.PlaybackStopped += OnPlaybackStopped;
+            player.VolumeMeter += OnUserVolumeMeter;
+            player.OpenFile(fileName);
         }
 
         private void btnPlaybackClick(object sender, RoutedEventArgs e)
         {
-            //if (!SelectedOutputDevicePlugin.IsAvailabel)
-            //{
-            //    MessageBox.Show("The selected output driver is not available on this system");
-            //    return;
-            //}
-
-            if (fileName == null) fileName = SelectInputFile();
-            if (fileName != null)
-            {
-                BeginPlayback(fileName);
-            }
+            player.Play();
+            EnableButtons(true);
+            dispatcherTimer.IsEnabled = true; // timer for updating current time label
         }
 
         private void btnPauseClick(object sender, RoutedEventArgs e)
         {
-            wavePlayer.Pause();
+            player.Pause();
         }
 
         private void btnStopClick(object sender, RoutedEventArgs e)
         {
-            wavePlayer.Stop();
+            player.Stop();
             // don't set button states now, we'll wait for our PlaybackStopped to come
         }
 
@@ -105,10 +103,10 @@ namespace NAudio_Wiki_Practise
 
         private void EnableButtons(bool playing)
         {
-            buttonOpen.IsEnabled = !playing;
-            buttonPlayback.IsEnabled = !playing;
-            buttonPause.IsEnabled = playing;
-            buttonStop.IsEnabled = playing;
+            //buttonOpen.IsEnabled = !playing;
+            //buttonPlayback.IsEnabled = !playing;
+            //buttonPause.IsEnabled = playing;
+            //buttonStop.IsEnabled = playing;
         }
 
         private static string SelectInputFile()
@@ -120,46 +118,36 @@ namespace NAudio_Wiki_Practise
             return null;
         }
 
-        private void BeginPlayback(string filename)
+        private void OnPlaybackStopped(object sender, AudioStoppedEventArgs e)
         {
-            Debug.Assert(wavePlayer == null);
-            wavePlayer = new WaveOut();
-            audioFileReader = new AudioFileReader(filename);
-            wavePlayer.Init(audioFileReader);
-            wavePlayer.PlaybackStopped += OnPlaybackStopped;
-            wavePlayer.Play();
-            EnableButtons(true);
-            dispatcherTimer.IsEnabled = true; // timer for updating current time label
-        }
-
-        private void OnPlaybackStopped(object sender, StoppedEventArgs e)
-        {
+            MessageBox.Show("stopped");
             // we want to be always on the GUI thread and be able to change GUI components
             // Debug.Assert(!InvokeRequired, "PlaybackStopped on wrong thread");
             // we want it to be safe to clean up input stream and playback device in the handler for PlaybackStopped
-            CleanUp();
-            EnableButtons(false);
-            dispatcherTimer.IsEnabled = false;
-            labelCurrentTime.Content = "Current Time: 00:00";
-            
+            //CleanUp();
+            //EnableButtons(false);
+            //dispatcherTimer.IsEnabled = false;
+            //labelCurrentTime.Content = "Current Time: 00:00";
+
             if (e.Exception != null)
             {
                 MessageBox.Show(String.Format("Playback Stopped due to an error {0}", e.Exception.Message));
             }
         }
 
+        void OnUserVolumeMeter(object sender, AudioVolumeMeterEventArgs e)
+        {
+            Debug.WriteLine("[OnUserVolumeMeter] max sample value is {0} ", e.MaxSampleValue);
+        }
+
         private void CleanUp()
         {
-            if (audioFileReader != null)
+            if (player != null)
             {
-                audioFileReader.Dispose();
-                audioFileReader = null;
+                player.CleanUp();
+                player = null;
             }
-            if (wavePlayer != null)
-            {
-                wavePlayer.Dispose();
-                wavePlayer = null;
-            }
+            
         }
 
         private static string FormatTimeSpan(TimeSpan ts)
@@ -169,18 +157,35 @@ namespace NAudio_Wiki_Practise
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (audioFileReader != null)
+            if (player != null)
             {
-                labelCurrentTime.Content = "Current Time: " + FormatTimeSpan(audioFileReader.CurrentTime);
-                labelTotalTime.Content = "Total Time: " + FormatTimeSpan(audioFileReader.TotalTime);
+                labelCurrentTime.Content = "Current Time: " + FormatTimeSpan(player.CurrentTime);
+                labelTotalTime.Content = "Total Time: " + FormatTimeSpan(player.TotalTime);
             }
         }
 
-        private IOutputDevicePlugin SelectedOutputDevicePlugin
+        private void btnStartRecordClick(object sender, RoutedEventArgs e)
         {
-            get { return (IOutputDevicePlugin)comboBoxWaveOutDevice.SelectedItem; }
+            recorder = new WaveInRecorder();
+            recorder.setFileName("D:\\Projects\\tongchuan\\Tongchuanclient_doc\\测试音频\\test_record.wav");
+            recorder.RecordStopped += OnPlaybackStopped;
+            recorder.VolumeMeter += OnUserVolumeMeter;
+            recorder.StartRecording();
         }
 
+        private void btnStopRecordClick(object sender, RoutedEventArgs e)
+        {
+            recorder.StopRecording();
+        }
 
+        private void btnPauseRecordClick(object sender, RoutedEventArgs e)
+        {
+            recorder.PauseRecording();
+        }
+
+        private void btnResumeRecordClick(object sender, RoutedEventArgs e)
+        {
+            recorder.StartRecording();
+        }
     }
 }
