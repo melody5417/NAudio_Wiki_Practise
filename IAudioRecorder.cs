@@ -13,6 +13,8 @@ namespace NAudio_Wiki_Practise
         /// </summary>
         TimeSpan RecordedTime { get; }
 
+        float Volume { get; set; }
+
         /// <summary>
         /// Indicates that record has gone into a stopped state or an error has been encountered during recording
         /// </summary>
@@ -21,7 +23,7 @@ namespace NAudio_Wiki_Practise
         /// <summary>
         ///  Raised periodically to inform the user of the max volume
         /// </summary>
-        event EventHandler<AudioVolumeMeterEventArgs> VolumeMeter;
+        event EventHandler<AudioVolumeMeterEventArgs> RecordVolumeMeter;
 
         /// <summary>
         /// Set fileName will close last session and start new.

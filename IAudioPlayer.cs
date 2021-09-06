@@ -19,6 +19,8 @@ namespace NAudio_Wiki_Practise
         /// </summary>
         TimeSpan TotalTime { get; }
 
+        float Volume { get; set; }
+
         /// <summary>
         /// Indicates that playback has gone into a stopped state due to 
         /// reaching the end of the input stream or an error has been encountered during playback
@@ -28,7 +30,7 @@ namespace NAudio_Wiki_Practise
         /// <summary>
         ///  Raised periodically to inform the user of the max volume
         /// </summary>
-        event EventHandler<AudioVolumeMeterEventArgs> VolumeMeter;
+        event EventHandler<AudioVolumeMeterEventArgs> PlaybackVolumeMeter;
 
         #endregion
 

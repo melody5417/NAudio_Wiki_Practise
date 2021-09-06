@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using NAudio.Mixer;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
@@ -20,8 +21,9 @@ namespace NAudio_Wiki_Practise
     public class WaveInRecorder : IAudioRecorder
     {
         private string fileName;
-        private IWaveIn waveRecorder;
+        private WaveIn waveRecorder;
         private WaveFileWriter waveFileWriter;
+        private UnsignedMixerControl volumeControl;
 
         private RecordState recordState;
 
@@ -38,9 +40,10 @@ namespace NAudio_Wiki_Practise
             }
         }
 
+
         public event EventHandler<AudioStoppedEventArgs> RecordStopped;
 
-        public event EventHandler<AudioVolumeMeterEventArgs> VolumeMeter;
+        public event EventHandler<AudioVolumeMeterEventArgs> RecordVolumeMeter;
 
         public void setFileName(string fileName)
         {
@@ -60,7 +63,66 @@ namespace NAudio_Wiki_Practise
             waveRecorder.RecordingStopped += OnRecordingStopped;
 
             waveFileWriter = new WaveFileWriter(fileName, waveFormat);
+
+            TryGetVolumeControl();
         }
+
+
+        private void TryGetVolumeControl()
+        {
+            int waveInDeviceNumber = waveRecorder.DeviceNumber;
+            if (Environment.OSVersion.Version.Major >= 6) // Vista and over
+            {
+                var mixerLine = waveRecorder.GetMixerLine();
+                foreach (var control in mixerLine.Controls)
+                {
+                    if (control.ControlType == MixerControlType.Volume)
+                    {
+                        this.volumeControl = control as UnsignedMixerControl;
+                        Volume = volume;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                var mixer = new Mixer(waveInDeviceNumber);
+                foreach (var destination in mixer.Destinations
+                    .Where(d => d.ComponentType == MixerLineComponentType.DestinationWaveIn))
+                {
+                    foreach (var source in destination.Sources
+                        .Where(source => source.ComponentType == MixerLineComponentType.SourceMicrophone))
+                    {
+                        foreach (var control in source.Controls
+                            .Where(control => control.ControlType == MixerControlType.Volume))
+                        {
+                            volumeControl = control as UnsignedMixerControl;
+                            Volume = volume;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        private float volume = 1.0f;
+        public float Volume
+        {
+            get
+            {
+                return volume;
+            }
+            set
+            {
+                volume = value;
+                if (volumeControl != null)
+                {
+                    volumeControl.Percent = value * 100;
+                }
+            }
+        }
+
 
         public void Dispose()
         {
@@ -137,11 +199,11 @@ namespace NAudio_Wiki_Practise
                 if (sample32 > max) max = sample32;
             }
 
-            if (VolumeMeter != null)
+            if (RecordVolumeMeter != null)
             {
                 var arg = new AudioVolumeMeterEventArgs();
                 arg.MaxSampleValue = max;
-                VolumeMeter(this, arg);
+                RecordVolumeMeter(this, arg);
             }
         }
 

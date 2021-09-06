@@ -52,9 +52,30 @@ namespace NAudio_Wiki_Practise
             }
         }
 
+        public float Volume {
+            get 
+            {
+                if (audioFileReader == null)
+                {
+                    return 0;
+                }
+
+                return audioFileReader.Volume;
+            }
+            set
+            {
+                if (audioFileReader == null)
+                {
+                    return;
+                }
+
+                audioFileReader.Volume = value;
+            } 
+        }
+
         public event EventHandler<AudioStoppedEventArgs> PlaybackStopped;
 
-        public event EventHandler<AudioVolumeMeterEventArgs> VolumeMeter;
+        public event EventHandler<AudioVolumeMeterEventArgs> PlaybackVolumeMeter;
 
         public void OpenFile(string fileName)
         {
@@ -151,11 +172,11 @@ namespace NAudio_Wiki_Practise
 
         void OnStreamVolumeMeter(object sender, StreamVolumeEventArgs e)
         {
-            if (VolumeMeter != null)
+            if (PlaybackVolumeMeter != null)
             {
                 var arg = new AudioVolumeMeterEventArgs();
                 arg.MaxSampleValue = e.MaxSampleValues[0];
-                VolumeMeter(this, arg);    
+                PlaybackVolumeMeter(this, arg);    
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
@@ -32,15 +33,20 @@ namespace NAudio_Wiki_Practise
 
         private DispatcherTimer dispatcherTimer;
 
+        private AudioDeviceManager deviceManager;
+
         public MainWindow()
         {
             InitializeComponent();
-            InitialiseDeviceCombo();
-            EnableButtons(false);
-            dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            dispatcherTimer.Interval = new TimeSpan(0,0, 1);
-            dispatcherTimer.Start();
+            //InitialiseDeviceCombo();
+            //EnableButtons(false);
+            //dispatcherTimer = new DispatcherTimer();
+            //dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            //dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            //dispatcherTimer.Start();
+
+            deviceManager = new AudioDeviceManager();
+            deviceManager.RefreshAudioDevices();
         }
 
         public void Dispose()
@@ -54,10 +60,17 @@ namespace NAudio_Wiki_Practise
             for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++)
             {
                 var capabilities = WaveOut.GetCapabilities(deviceId);
+                Debug.WriteLine($"Device {deviceId} ({capabilities.ProductName})");
                 comboBoxWaveOutDevice.Items.Add($"Device {deviceId} ({capabilities.ProductName})");
             }
             comboBoxWaveOutDevice.SelectionChanged += OnComboBoxWaveOutDeviceSelectionChanged;
             comboBoxWaveOutDevice.SelectedIndex = 0;
+
+            for (var deviceId = -1; deviceId < WaveIn.DeviceCount; deviceId++)
+            {
+                var capabilities = WaveOut.GetCapabilities(deviceId);
+                Debug.WriteLine($"Device {deviceId} ({capabilities.ProductName})");
+            }
         }
 
         #region Actions
@@ -68,7 +81,7 @@ namespace NAudio_Wiki_Practise
             if (string.IsNullOrWhiteSpace(fileName)) return;
             player = new WaveOutPlayer();
             player.PlaybackStopped += OnPlaybackStopped;
-            player.VolumeMeter += OnUserVolumeMeter;
+            player.PlaybackVolumeMeter += PlaybackVolumeMeter;
             player.OpenFile(fileName);
         }
 
@@ -120,7 +133,7 @@ namespace NAudio_Wiki_Practise
 
         private void OnPlaybackStopped(object sender, AudioStoppedEventArgs e)
         {
-            MessageBox.Show("stopped");
+            MessageBox.Show("playback stopped");
             // we want to be always on the GUI thread and be able to change GUI components
             // Debug.Assert(!InvokeRequired, "PlaybackStopped on wrong thread");
             // we want it to be safe to clean up input stream and playback device in the handler for PlaybackStopped
@@ -135,9 +148,41 @@ namespace NAudio_Wiki_Practise
             }
         }
 
-        void OnUserVolumeMeter(object sender, AudioVolumeMeterEventArgs e)
+        private void OnRecordStopped(object sender, AudioStoppedEventArgs e)
         {
-            Debug.WriteLine("[OnUserVolumeMeter] max sample value is {0} ", e.MaxSampleValue);
+            MessageBox.Show("record stopped");
+
+            if (WaveForm != null)
+            {
+                WaveForm.Reset();
+            }
+
+            // we want to be always on the GUI thread and be able to change GUI components
+            // Debug.Assert(!InvokeRequired, "PlaybackStopped on wrong thread");
+            // we want it to be safe to clean up input stream and playback device in the handler for PlaybackStopped
+            //CleanUp();
+            //EnableButtons(false);
+            //dispatcherTimer.IsEnabled = false;
+            //labelCurrentTime.Content = "Current Time: 00:00";
+
+            if (e.Exception != null)
+            {
+                MessageBox.Show(String.Format("Record Stopped due to an error {0}", e.Exception.Message));
+            }
+        }
+
+        void PlaybackVolumeMeter(object sender, AudioVolumeMeterEventArgs e)
+        {
+            Debug.WriteLine("[PlaybackVolumeMeter] max sample value is {0} ", e.MaxSampleValue);
+            Debug.WriteLine("get current mic volume is {0}", player.Volume);
+        }
+
+        void RecordVolumeMeter(object sender, AudioVolumeMeterEventArgs e)
+        {
+            Debug.WriteLine("[RecordVolumeMeter] max sample value is {0} ", e.MaxSampleValue);
+            Debug.WriteLine("get current player volume is {0}", recorder.Volume);
+
+            WaveForm.AddValue(e.MaxSampleValue, -e.MaxSampleValue);
         }
 
         private void CleanUp()
@@ -146,6 +191,10 @@ namespace NAudio_Wiki_Practise
             {
                 player.CleanUp();
                 player = null;
+            }
+            if (WaveForm != null)
+            {
+                WaveForm.Reset();
             }
             
         }
@@ -168,8 +217,8 @@ namespace NAudio_Wiki_Practise
         {
             recorder = new WaveInRecorder();
             recorder.setFileName("D:\\Projects\\tongchuan\\Tongchuanclient_doc\\测试音频\\test_record.wav");
-            recorder.RecordStopped += OnPlaybackStopped;
-            recorder.VolumeMeter += OnUserVolumeMeter;
+            recorder.RecordStopped += OnRecordStopped;
+            recorder.RecordVolumeMeter += RecordVolumeMeter;
             recorder.StartRecording();
         }
 
@@ -187,5 +236,30 @@ namespace NAudio_Wiki_Practise
         {
             recorder.StartRecording();
         }
+
+        private float microLevel;
+        public float MicrophoneLevel
+        {
+            get { return microLevel; }
+            set 
+            { 
+                microLevel = value;
+                player.Volume = value;
+            }
+        }
+
+        private void OnSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (player != null)
+            {
+                player.Volume = (float)e.NewValue;
+            }
+            if (recorder != null)
+            {
+                recorder.Volume = (float)e.NewValue;
+            }
+            
+        }
+
     }
 }

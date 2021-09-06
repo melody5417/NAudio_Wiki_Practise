@@ -34,3 +34,8 @@ F:\口语考试\NAudio_Wiki_Practise\obj\Debug\NAudio_Wiki_Practise.csproj.CoreC
 F:\口语考试\NAudio_Wiki_Practise\obj\Debug\NAudio_Wiki_Practise.csproj.CopyComplete
 F:\口语考试\NAudio_Wiki_Practise\obj\Debug\NAudio_Wiki_Practise.exe
 F:\口语考试\NAudio_Wiki_Practise\obj\Debug\NAudio_Wiki_Practise.pdb
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\WPFSoundVisualizationLib.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\WaveFormRendererLib.pdb
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\VoiceRecorder.Audio.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\AudioSwitcher.AudioApi.CoreAudio.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\AudioSwitcher.AudioApi.dll
