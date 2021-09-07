@@ -74,5 +74,8 @@
         
         <my:PolygonWaveFormControl Name="WaveForm" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Margin="5" Height="100" />
 
+
+        <local:MVVMUserControl></local:MVVMUserControl>
+        
     </Grid>
 </Window>

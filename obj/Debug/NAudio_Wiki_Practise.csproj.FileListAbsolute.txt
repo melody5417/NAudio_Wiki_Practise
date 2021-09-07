@@ -39,3 +39,16 @@ F:\口语考试\NAudio_Wiki_Practise\bin\Debug\WaveFormRendererLib.pdb
 F:\口语考试\NAudio_Wiki_Practise\bin\Debug\VoiceRecorder.Audio.dll
 F:\口语考试\NAudio_Wiki_Practise\bin\Debug\AudioSwitcher.AudioApi.CoreAudio.dll
 F:\口语考试\NAudio_Wiki_Practise\bin\Debug\AudioSwitcher.AudioApi.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\CommonServiceLocator.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\GalaSoft.MvvmLight.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\GalaSoft.MvvmLight.Extras.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\System.Windows.Interactivity.dll
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\GalaSoft.MvvmLight.pdb
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\GalaSoft.MvvmLight.xml
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\GalaSoft.MvvmLight.Extras.pdb
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\GalaSoft.MvvmLight.Extras.xml
+F:\口语考试\NAudio_Wiki_Practise\bin\Debug\System.Windows.Interactivity.xml
+F:\口语考试\NAudio_Wiki_Practise\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\口语考试\NAudio_Wiki_Practise\obj\Debug\App.baml
+F:\口语考试\NAudio_Wiki_Practise\obj\Debug\MVVMUserControl.g.cs
+F:\口语考试\NAudio_Wiki_Practise\obj\Debug\MVVMUserControl.baml
