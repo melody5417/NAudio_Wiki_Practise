@@ -21,12 +21,31 @@ namespace NAudio_Wiki_Practise
     public class WaveInRecorder : IAudioRecorder
     {
         private string fileName;
+
         private WaveIn waveRecorder;
+
         private WaveFileWriter waveFileWriter;
+
         private UnsignedMixerControl volumeControl;
 
         private RecordState recordState;
 
+        private float volume = 1.0f;
+        public float Volume
+        {
+            get
+            {
+                return volume;
+            }
+            set
+            {
+                volume = value;
+                if (volumeControl != null)
+                {
+                    volumeControl.Percent = value * 100;
+                }
+            }
+        }
 
         public TimeSpan RecordedTime
         {
@@ -39,7 +58,6 @@ namespace NAudio_Wiki_Practise
                 return TimeSpan.FromSeconds((double)waveFileWriter.Length / waveFileWriter.WaveFormat.AverageBytesPerSecond);
             }
         }
-
 
         public event EventHandler<AudioStoppedEventArgs> RecordStopped;
 
@@ -106,27 +124,30 @@ namespace NAudio_Wiki_Practise
 
         }
 
-        private float volume = 1.0f;
-        public float Volume
-        {
-            get
-            {
-                return volume;
-            }
-            set
-            {
-                volume = value;
-                if (volumeControl != null)
-                {
-                    volumeControl.Percent = value * 100;
-                }
-            }
-        }
-
-
         public void Dispose()
         {
-            throw new NotImplementedException();
+            CleanUp();
+        }
+
+        public void CleanUp()
+        {
+            if (fileName != null)
+            {
+                fileName = null;
+            }
+
+            if (waveRecorder != null)
+            {
+                waveRecorder.StopRecording();
+                waveRecorder.Dispose();
+                waveRecorder = null;
+            }
+
+            if (waveFileWriter != null)
+            {
+                waveFileWriter.Dispose();
+                waveFileWriter = null;
+            }
         }
 
         public void StartRecording()

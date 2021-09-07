@@ -52,3 +52,5 @@ F:\口语考试\NAudio_Wiki_Practise\obj\Debug\GeneratedInternalTypeHelper.g.cs
 F:\口语考试\NAudio_Wiki_Practise\obj\Debug\App.baml
 F:\口语考试\NAudio_Wiki_Practise\obj\Debug\MVVMUserControl.g.cs
 F:\口语考试\NAudio_Wiki_Practise\obj\Debug\MVVMUserControl.baml
+F:\口语考试\NAudio_Wiki_Practise\obj\Debug\MainCopyWindow.g.cs
+F:\口语考试\NAudio_Wiki_Practise\obj\Debug\MainCopyWindow.baml

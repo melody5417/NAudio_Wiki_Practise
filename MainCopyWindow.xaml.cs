@@ -25,7 +25,7 @@ namespace NAudio_Wiki_Practise
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainCopyWindow : Window
     {
         private IAudioPlayer player;
 
@@ -35,26 +35,24 @@ namespace NAudio_Wiki_Practise
 
         private AudioDeviceManager deviceManager;
 
-        public MainWindow()
+        public MainCopyWindow()
         {
             InitializeComponent();
-            //InitialiseDeviceCombo();
-            //EnableButtons(false);
-            //dispatcherTimer = new DispatcherTimer();
-            //dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-            //dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            //dispatcherTimer.Start();
+            EnableButtons(false);
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            dispatcherTimer.Start();
 
             deviceManager = new AudioDeviceManager();
             deviceManager.RefreshAudioDevices();
 
-            Loaded += MainWindow_Loaded;
+            Closed += MainWindow_Closed;
         }
 
-        void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
-            MainCopyWindow newWindow = new MainCopyWindow() { Owner = this };
-            newWindow.Show();
+            this.Dispose();
         }
 
         public void Dispose()
@@ -62,25 +60,7 @@ namespace NAudio_Wiki_Practise
             CleanUp();
         }
 
-
-        private void InitialiseDeviceCombo()
-        {
-            if (WaveOut.DeviceCount <= 0) return;
-            for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++)
-            {
-                var capabilities = WaveOut.GetCapabilities(deviceId);
-                Debug.WriteLine($"Device {deviceId} ({capabilities.ProductName})");
-                comboBoxWaveOutDevice.Items.Add($"Device {deviceId} ({capabilities.ProductName})");
-            }
-            comboBoxWaveOutDevice.SelectionChanged += OnComboBoxWaveOutDeviceSelectionChanged;
-            comboBoxWaveOutDevice.SelectedIndex = 0;
-
-            for (var deviceId = -1; deviceId < WaveIn.DeviceCount; deviceId++)
-            {
-                var capabilities = WaveOut.GetCapabilities(deviceId);
-                Debug.WriteLine($"Device {deviceId} ({capabilities.ProductName})");
-            }
-        }
+        
 
         #region Actions
 

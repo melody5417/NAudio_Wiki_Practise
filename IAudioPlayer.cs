@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NAudio_Wiki_Practise
 {
-    public interface IAudioPlayer
+    public interface IAudioPlayer : IDisposable
     {
         #region Property
 
@@ -19,6 +19,9 @@ namespace NAudio_Wiki_Practise
         /// </summary>
         TimeSpan TotalTime { get; }
 
+        /// <summary>
+        /// The adjustment takes effect in real time
+        /// </summary>
         float Volume { get; set; }
 
         /// <summary>
@@ -53,8 +56,6 @@ namespace NAudio_Wiki_Practise
         /// If fail will throw exception through PlaybackStopped.
         /// </summary>
         void Stop();
-
-        void CleanUp();
 
     }
 }

@@ -95,6 +95,9 @@
     <Compile Include="IAudioRecorder.cs" />
     <Compile Include="AudioVolumeMeterEventArgs.cs" />
     <Compile Include="AudioNotificationClient.cs" />
+    <Compile Include="MainCopyWindow.xaml.cs">
+      <DependentUpon>MainCopyWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MVVMUserControl.xaml.cs">
       <DependentUpon>MVVMUserControl.xaml</DependentUpon>
     </Compile>
@@ -102,6 +105,10 @@
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="WaveInRecorder.cs" />
     <Compile Include="WaveOutPlayer.cs" />
+    <Page Include="MainCopyWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

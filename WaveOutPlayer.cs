@@ -12,7 +12,9 @@ namespace NAudio_Wiki_Practise
     public class WaveOutPlayer : IAudioPlayer
     {
         private string fileName;
+
         private AudioFileReader audioFileReader;
+
         private IWavePlayer wavePlayer;
 
         public TimeSpan CurrentTime 
@@ -76,6 +78,11 @@ namespace NAudio_Wiki_Practise
         public event EventHandler<AudioStoppedEventArgs> PlaybackStopped;
 
         public event EventHandler<AudioVolumeMeterEventArgs> PlaybackVolumeMeter;
+
+        public void Dispose()
+        {
+            CleanUp();
+        }
 
         public void OpenFile(string fileName)
         {

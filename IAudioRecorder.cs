@@ -6,13 +6,16 @@ using System.Text;
 
 namespace NAudio_Wiki_Practise
 {
-    public interface IAudioRecorder
+    public interface IAudioRecorder : IDisposable
     {
         /// <summary>
         /// Record time in seconds.
         /// </summary>
         TimeSpan RecordedTime { get; }
 
+        /// <summary>
+        /// The adjustment takes effect in real time
+        /// </summary>
         float Volume { get; set; }
 
         /// <summary>
@@ -36,7 +39,5 @@ namespace NAudio_Wiki_Practise
         void PauseRecording();
 
         void StopRecording();
-
-        void Dispose();
     }
 }
